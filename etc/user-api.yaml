@@ -1,0 +1,27 @@
+Name: user-api
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+Timeout: 0
+Log:
+  Mode: console
+  Level: info
+Database:
+  DSN: "host=localhost user=postgres password=postgres dbname=user_mgmt port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+  MaxIdleConns: 10
+  MaxOpenConns: 30
+  ConnMaxLifetime: 1h
+
+JWT:
+  AccessSecret: "please-change-me"
+  AccessExpire: 1h
+  RefreshExpire: 24h
+
+Password:
+  BcryptCost: 12
+Pagination:
+  DefaultPageSize: 20
+  MaxPageSize: 100
+Security:
+  AllowOrigins:
+    - "*"

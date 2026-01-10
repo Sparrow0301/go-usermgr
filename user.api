@@ -1,0 +1,125 @@
+syntax = "v1"
+
+info(
+	title: "User Management System"
+	desc: "基于 Go-zero + GORM 的用户权限管理系统"
+	author: "CodeBuddy"
+	version: "v1.0"
+)
+
+// 数据结构定义，同 internal/types 保持一致
+type (
+	RegisterRequest {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		FullName string `json:"fullName"`
+	}
+
+	LoginRequest {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	LoginResponse {
+		AccessToken  string   `json:"accessToken"`
+		ExpiresAt    int64    `json:"expiresAt"`
+		RefreshToken string   `json:"refreshToken"`
+		User         UserDTO  `json:"user"`
+	}
+
+	UserDTO {
+		ID        uint      `json:"id"`
+		Username  string    `json:"username"`
+		Email     string    `json:"email"`
+		FullName  string    `json:"fullName"`
+		Status    string    `json:"status"`
+		Roles     []string  `json:"roles"`
+		CreatedAt int64     `json:"createdAt"`
+		UpdatedAt int64     `json:"updatedAt"`
+	}
+
+	ProfileResponse {
+		User UserDTO `json:"user"`
+	}
+
+	UpdateProfileRequest {
+		Email    string `json:"email"`
+		FullName string `json:"fullName"`
+	}
+
+	ChangePasswordRequest {
+		OldPassword string `json:"oldPassword"`
+		NewPassword string `json:"newPassword"`
+	}
+
+	ChangePasswordResponse {
+		Message string `json:"message"`
+	}
+
+	ListUsersRequest {
+		Page     int    `form:"page"`
+		PageSize int    `form:"pageSize"`
+		Keyword  string `form:"keyword"`
+		Status   string `form:"status"`
+	}
+
+	ListUsersResponse {
+		Data       []UserDTO `json:"data"`
+		Page       int       `json:"page"`
+		PageSize   int       `json:"pageSize"`
+		TotalItems int64     `json:"totalItems"`
+		TotalPages int       `json:"totalPages"`
+	}
+
+	UpdateUserStatusRequest {
+		Status string `json:"status"`
+	}
+
+	AssignRolesRequest {
+		Roles []string `json:"roles"`
+	}
+)
+
+// 公共接口（无需认证）
+service user-api {
+	@handler Register
+	post /api/v1/auth/register (RegisterRequest) returns (ProfileResponse)
+
+	@handler Login
+	post /api/v1/auth/login (LoginRequest) returns (LoginResponse)
+}
+
+// 个人中心，需要 JWT 认证
+@server(
+	jwt: Auth
+	group: me
+	middleware: AuthMiddleware
+)
+service user-api {
+	@handler Profile
+	get /api/v1/me returns (ProfileResponse)
+
+	@handler UpdateProfile
+	put /api/v1/me (UpdateProfileRequest) returns (ProfileResponse)
+
+	@handler ChangePassword
+	post /api/v1/me/password (ChangePasswordRequest) returns (ChangePasswordResponse)
+}
+
+// 管理员接口，需要 JWT + RBAC
+@server(
+	jwt: Auth
+	group: admin
+	middleware: AuthMiddleware
+)
+service user-api {
+	@handler ListUsers
+	get /api/v1/admin/users (ListUsersRequest) returns (ListUsersResponse)
+
+	@handler UpdateUserStatus
+	patch /api/v1/admin/users/:id/status (UpdateUserStatusRequest) returns (ProfileResponse)
+
+	@handler AssignRoles
+	post /api/v1/admin/users/:id/roles (AssignRolesRequest) returns (ProfileResponse)
+}

@@ -1,0 +1,17 @@
+# usermgmt/internal/svc
+internal\svc\service_context.go:49:11: not enough arguments in call to logx.NewWriter
+	have ()
+	want (io.Writer)
+internal\svc\service_context.go:49:11: cannot use logx.NewWriter() (value of interface type logx.Writer) as io.Writer value in argument to log.New: logx.Writer does not implement io.Writer (missing method Write)
+FAIL	usermgmt/cmd/api [build failed]
+?   	usermgmt/internal/config	[no test files]
+?   	usermgmt/internal/errorx	[no test files]
+FAIL	usermgmt/internal/handler [build failed]
+FAIL	usermgmt/internal/handler/auth [build failed]
+FAIL	usermgmt/internal/logic/auth [build failed]
+?   	usermgmt/internal/model	[no test files]
+FAIL	usermgmt/internal/svc [build failed]
+?   	usermgmt/internal/types	[no test files]
+?   	usermgmt/pkg/response	[no test files]
+?   	usermgmt/pkg/security	[no test files]
+FAIL
